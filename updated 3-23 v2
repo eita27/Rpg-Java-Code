@@ -1,0 +1,433 @@
+import java.util.*;
+
+// ================= BASE CHARACTER =================
+class Character {
+    String name, job;
+    int health, damage, stamina;
+    Random rand = new Random();
+
+    Character(String name, String job, int health, int damage, int stamina) {
+        this.name = name;
+        this.job = job;
+        this.health = health;
+        this.damage = damage;
+        this.stamina = stamina;
+    }
+
+    boolean isAlive() {
+        return health > 0;
+    }
+
+    void gainStamina() {
+        stamina += 5;
+    }
+
+    void lightAttack(Character enemy) {
+        int cost = 5;
+
+        if (stamina < cost) {
+            System.out.println(name + " doesn't have enough stamina!");
+            return;
+        }
+
+        stamina -= cost;
+
+        int min = (int)(damage * 0.8);
+        int max = (int)(damage * 1.2);
+        int finalDamage = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < 20) {
+            finalDamage *= 2;
+            System.out.println("CRITICAL HIT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used LIGHT ATTACK and dealt " + finalDamage + " damage!");
+    }
+
+    void heavyAttack(Character enemy) {
+        int cost = 10;
+
+        if (stamina < cost) {
+            System.out.println(name + " doesn't have enough stamina!");
+            return;
+        }
+
+        stamina -= cost;
+
+        int base = damage * 2;
+        int min = (int)(base * 0.9);
+        int max = (int)(base * 1.5);
+        int finalDamage = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < 30) {
+            finalDamage *= 2;
+            System.out.println("CRITICAL HEAVY HIT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used HEAVY ATTACK and dealt " + finalDamage + " damage!");
+    }
+
+    String getResourceDisplay() {
+        return "Stamina: " + stamina;
+    }
+}
+
+// ================= ARCHER =================
+class Archer extends Character {
+    int arrows;
+
+    Archer(String name) {
+        super(name, "Archer", 170, 20, 25);
+        arrows = 20;
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (arrows <= 0) {
+            System.out.println("No arrows left!");
+            return;
+        }
+        super.lightAttack(enemy);
+        arrows--;
+        System.out.println("Arrows left: " + arrows);
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (arrows < 2) {
+            System.out.println("Not enough arrows!");
+            return;
+        }
+        super.heavyAttack(enemy);
+        arrows -= 2;
+        System.out.println("Arrows left: " + arrows);
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina + " | Arrows: " + arrows;
+    }
+}
+
+// ================= ASSASSIN =================
+class Assassin extends Character {
+
+    Assassin(String name) {
+        super(name, "Assassin", 150, 22, 40);
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (stamina < 5) {
+            System.out.println(name + " doesn't have enough stamina!");
+            return;
+        }
+
+        stamina -= 5;
+
+        int min = (int)(damage * 0.8);
+        int max = (int)(damage * 1.2);
+        int finalDamage = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < 40) {
+            finalDamage *= 2;
+            System.out.println("ASSASSIN CRITICAL HIT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used LIGHT ATTACK and dealt " + finalDamage + " damage!");
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (stamina < 10) {
+            System.out.println(name + " doesn't have enough stamina!");
+            return;
+        }
+
+        stamina -= 10;
+
+        int base = damage * 2;
+        int min = (int)(base * 0.9);
+        int max = (int)(base * 1.5);
+        int finalDamage = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < 50) {
+            finalDamage *= 2;
+            System.out.println("DEADLY ASSASSIN CRIT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used HEAVY ATTACK and dealt " + finalDamage + " damage!");
+    }
+}
+
+// ================= MAGE =================
+class Mage extends Character {
+    int mana;
+
+    Mage(String name) {
+        super(name, "Mage", 160, 25, 50);
+        mana = 50;
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (mana < 3) {
+            System.out.println("Not enough mana!");
+            return;
+        }
+        mana -= 3;
+        super.lightAttack(enemy);
+        System.out.println("Mana left: " + mana);
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (mana < 6) {
+            System.out.println("Not enough mana!");
+            return;
+        }
+        mana -= 6;
+        super.heavyAttack(enemy);
+        System.out.println("Mana left: " + mana);
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina + " | Mana: " + mana;
+    }
+}
+
+// ================= KNIGHT =================
+class Knight extends Character {
+    Knight(String name) {
+        super(name, "Knight", 200, 23, 45);
+    }
+}
+
+// ================= SERAPHIM =================
+class Seraphim extends Character {
+
+    Seraphim(String name) {
+        super(name, "Seraphim", Integer.MAX_VALUE, 1000, Integer.MAX_VALUE);
+    }
+
+    @Override
+    boolean isAlive() {
+        return true; // 🔥 cannot die
+    }
+
+    @Override
+    void gainStamina() {
+        // 🔥 does nothing (infinite stamina anyway)
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        int finalDamage = damage;
+
+        if (rand.nextInt(100) < 50) {
+            finalDamage *= 2;
+            System.out.println("DIVINE LIGHT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used DIVINE LGIHT and dealt " + finalDamage + " damage!");
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        int finalDamage = damage * 2;
+
+        if (rand.nextInt(100) < 70) {
+            finalDamage *= 2;
+            System.out.println("HEAVENLY JUDGMENT!");
+        }
+
+        enemy.health -= finalDamage;
+        System.out.println(name + " used FINAL JUDGMENT and dealt " + finalDamage + " damage!");
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Divinity: ∞";
+    }
+}
+
+// ================= ENEMY =================
+class Enemy extends Character {
+
+    Enemy(String name, int health, int damage) {
+        super(name, "Enemy", health, damage, 10);
+    }
+
+    void enemyAttack(Character player) {
+        if (rand.nextBoolean()) {
+            lightAttack(player);
+        } else {
+            heavyAttack(player);
+        }
+    }
+}
+
+// ================= MAIN =================
+public class Main {
+
+    static Scanner input = new Scanner(System.in);
+
+    // ---------- STORY ----------
+    public static void storyIntro() {
+        System.out.println("\n=== PROLOGUE ===");
+        System.out.println("You awaken in a strange land...");
+        System.out.println("A floating companion greets you.");
+        System.out.println("\"Hey! You're finally awake!\"");
+        System.out.println("You arrive in MONDSTADT, the City of Freedom.");
+        System.out.println("But a dragon—DVALIN—is attacking!");
+        System.out.println("You decide to help...\n");
+    }
+
+    public static void storyBeforeEnemy(int index, Enemy enemy) {
+        System.out.println("\n=== STORY ===");
+
+        switch (index) {
+            case 0:
+                System.out.println("Slimes bounce toward you!");
+                break;
+            case 1:
+                System.out.println("Hilichurls are causing trouble nearby.");
+                break;
+            case 2:
+                System.out.println("A Lawachurl blocks your path.");
+                break;
+            case 3:
+                System.out.println("An Abyess Mage appears...");
+                break;
+            case 4:
+                System.out.println("A Ruin Guard awakens!");
+                break;
+            case 5:
+                System.out.println("FINAL BATTLE: DVALIN, THE STORMTERROR!");
+                break;
+        }
+
+        System.out.println("\nA wild " + enemy.name + " appeared!");
+    }
+
+    public static void storyEnding(boolean win) {
+        System.out.println("\n=== EPILOGUE ===");
+
+        if (win) {
+            System.out.println("Dvalin is freed. Peace returns to Mondstadt.");
+        } else {
+            System.out.println("You were defeated... but your journey continues.");
+        }
+    }
+
+    // ---------- GAME ----------
+    public static Character chooseClass() {
+
+        System.out.println("Choose your class:");
+        System.out.println("1. Archer");
+        System.out.println("2. Assassin");
+        System.out.println("3. Mage");
+        System.out.println("4. Knight");
+        System.out.print("Choice: ");
+
+        int choice = input.nextInt();
+
+        System.out.print("Enter your name: ");
+        String name = input.next();
+
+        switch (choice) {
+            case 1: return new Archer(name);
+            case 2: return new Assassin(name);
+            case 3: return new Mage(name);
+            case 777: return new Seraphim(name);
+            default: return new Knight(name);
+        }
+    }
+
+    public static Enemy[] createEnemies() {
+        return new Enemy[] {
+            new Enemy("Slime", 30, 4),
+            new Enemy("Hilichurl", 40, 8),
+            new Enemy("Lawachurl", 60, 10),
+            new Enemy("Abyss Mage", 80, 12),
+            new Enemy("Ruin Guard", 100, 14),
+            new Enemy("STORMTERROR DVALIN", 150, 18)
+        };
+    }
+
+    public static void battle(Character player, Enemy enemy, int index) {
+
+        storyBeforeEnemy(index, enemy);
+
+        while (player.isAlive() && enemy.isAlive()) {
+
+            player.gainStamina();
+            enemy.gainStamina();
+
+            System.out.println("\n" + player.name + " (" + player.job + ")");
+            System.out.println("HP: " + player.health + " | " + player.getResourceDisplay());
+            System.out.println(enemy.name + " HP: " + enemy.health);
+
+            System.out.println("1. Light Attack");
+            System.out.println("2. Heavy Attack");
+            System.out.print("Choice: ");
+
+            int action = input.nextInt();
+
+            if (action == 1) player.lightAttack(enemy);
+            else player.heavyAttack(enemy);
+
+            if (enemy.isAlive()) {
+                enemy.enemyAttack(player);
+            }
+        }
+
+        if (!player.isAlive()) {
+            System.out.println("You were defeated...");
+        } else {
+            System.out.println("Enemy defeated!");
+        }
+    }
+
+    public static void main(String[] args) {
+
+        boolean playing = true;
+
+        while (playing) {
+
+            storyIntro();
+
+            Character player = chooseClass();
+            Enemy[] enemies = createEnemies();
+
+            boolean survivedAll = true;
+
+            for (int i = 0; i < enemies.length; i++) {
+
+                battle(player, enemies[i], i);
+
+                if (!player.isAlive()) {
+                    survivedAll = false;
+                    break;
+                }
+            }
+
+            storyEnding(survivedAll);
+
+            System.out.println("\n1. Restart Game");
+            System.out.println("2. Exit");
+
+            int choice = input.nextInt();
+
+            if (choice != 1) playing = false;
+        }
+
+        System.out.println("Game closed.");
+    }
+}
