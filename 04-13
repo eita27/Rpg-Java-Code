@@ -1,0 +1,373 @@
+import java.util.*;
+
+// ================= ABSTRACT CHARACTER =================
+abstract class Character {
+    String name, job;
+    int health, damage, stamina;
+    Random rand = new Random();
+
+    Character(String name, String job, int health, int damage, int stamina) {
+        this.name = name;
+        this.job = job;
+        this.health = health;
+        this.damage = damage;
+        this.stamina = stamina;
+    }
+
+    boolean isAlive() {
+        return health > 0;
+    }
+
+    void gainStamina() {
+        stamina += 5;
+    }
+
+    // 🔥 ABSTRACT METHODS
+    abstract void lightAttack(Character enemy);
+    abstract void heavyAttack(Character enemy);
+    abstract String getResourceDisplay();
+
+    // 🔥 SHARED DAMAGE LOGIC
+    protected int calculateLightDamage(int critChance) {
+        int min = (int)(damage * 0.8);
+        int max = (int)(damage * 1.2);
+        int dmg = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < critChance) {
+            dmg *= 2;
+            System.out.println("CRITICAL HIT!");
+        }
+
+        return dmg;
+    }
+
+    protected int calculateHeavyDamage(int critChance) {
+        int base = damage * 2;
+        int min = (int)(base * 0.9);
+        int max = (int)(base * 1.5);
+        int dmg = rand.nextInt(max - min + 1) + min;
+
+        if (rand.nextInt(100) < critChance) {
+            dmg *= 2;
+            System.out.println("CRITICAL HEAVY HIT!");
+        }
+
+        return dmg;
+    }
+}
+
+// ================= ARCHER =================
+class Archer extends Character {
+    int arrows = 20;
+
+    Archer(String name) {
+        super(name, "Archer", 170, 20, 25);
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (arrows <= 0 || stamina < 5) {
+            System.out.println("Not enough resources!");
+            return;
+        }
+
+        stamina -= 5;
+        arrows--;
+
+        int dmg = calculateLightDamage(20);
+        enemy.health -= dmg;
+
+        System.out.println(name + " shot an arrow for " + dmg + " damage!");
+        System.out.println("Arrows left: " + arrows);
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (arrows < 2 || stamina < 10) {
+            System.out.println("Not enough resources!");
+            return;
+        }
+
+        stamina -= 10;
+        arrows -= 2;
+
+        int dmg = calculateHeavyDamage(30);
+        enemy.health -= dmg;
+
+        System.out.println(name + " fired a POWER SHOT for " + dmg + " damage!");
+        System.out.println("Arrows left: " + arrows);
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina + " | Arrows: " + arrows;
+    }
+}
+
+// ================= ASSASSIN =================
+class Assassin extends Character {
+
+    Assassin(String name) {
+        super(name, "Assassin", 150, 22, 40);
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (stamina < 5) {
+            System.out.println("Not enough stamina!");
+            return;
+        }
+
+        stamina -= 5;
+        int dmg = calculateLightDamage(40);
+        enemy.health -= dmg;
+
+        System.out.println(name + " struck swiftly for " + dmg + " damage!");
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (stamina < 10) {
+            System.out.println("Not enough stamina!");
+            return;
+        }
+
+        stamina -= 10;
+        int dmg = calculateHeavyDamage(50);
+        enemy.health -= dmg;
+
+        System.out.println(name + " performed a DEADLY STRIKE for " + dmg + " damage!");
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina;
+    }
+}
+
+// ================= MAGE =================
+class Mage extends Character {
+    int mana = 50;
+
+    Mage(String name) {
+        super(name, "Mage", 160, 25, 50);
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (mana < 3 || stamina < 5) {
+            System.out.println("Not enough resources!");
+            return;
+        }
+
+        mana -= 3;
+        stamina -= 5;
+
+        int dmg = calculateLightDamage(25);
+        enemy.health -= dmg;
+
+        System.out.println(name + " cast MAGIC MISSILE for " + dmg + " damage!");
+        System.out.println("Mana left: " + mana);
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (mana < 6 || stamina < 10) {
+            System.out.println("Not enough resources!");
+            return;
+        }
+
+        mana -= 6;
+        stamina -= 10;
+
+        int dmg = calculateHeavyDamage(35);
+        enemy.health -= dmg;
+
+        System.out.println(name + " cast ARCANE BLAST for " + dmg + " damage!");
+        System.out.println("Mana left: " + mana);
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina + " | Mana: " + mana;
+    }
+}
+
+// ================= KNIGHT =================
+class Knight extends Character {
+
+    Knight(String name) {
+        super(name, "Knight", 200, 23, 45);
+    }
+
+    @Override
+    void lightAttack(Character enemy) {
+        if (stamina < 5) {
+            System.out.println("Not enough stamina!");
+            return;
+        }
+
+        stamina -= 5;
+        int dmg = calculateLightDamage(20);
+        enemy.health -= dmg;
+
+        System.out.println(name + " slashed for " + dmg + " damage!");
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        if (stamina < 10) {
+            System.out.println("Not enough stamina!");
+            return;
+        }
+
+        stamina -= 10;
+        int dmg = calculateHeavyDamage(30);
+        enemy.health -= dmg;
+
+        System.out.println(name + " crushed with a heavy blow for " + dmg + " damage!");
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Stamina: " + stamina;
+    }
+}
+
+// ================= SERAPHIM (SECRET CLASS) =================
+class Seraphim extends Character {
+
+    Seraphim(String name) {
+        super(name, "Seraphim", Integer.MAX_VALUE, 1000, Integer.MAX_VALUE);
+    }
+
+    @Override
+    boolean isAlive() {
+        return true;
+    }
+
+    @Override
+    void gainStamina() {}
+
+    @Override
+    void lightAttack(Character enemy) {
+        int dmg = damage;
+        if (rand.nextInt(100) < 50) {
+            dmg *= 2;
+            System.out.println("DIVINE LIGHT!");
+        }
+        enemy.health -= dmg;
+        System.out.println(name + " smites for " + dmg + " damage!");
+    }
+
+    @Override
+    void heavyAttack(Character enemy) {
+        int dmg = damage * 2;
+        if (rand.nextInt(100) < 70) {
+            dmg *= 2;
+            System.out.println("HEAVENLY JUDGMENT!");
+        }
+        enemy.health -= dmg;
+        System.out.println(name + " unleashes FINAL JUDGMENT for " + dmg + " damage!");
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "Divinity: ∞";
+    }
+}
+
+// ================= ENEMY =================
+class Enemy extends Character {
+
+    Enemy(String name, int health, int damage) {
+        super(name, "Enemy", health, damage, 10);
+    }
+
+    @Override
+    void lightAttack(Character player) {
+        int dmg = calculateLightDamage(15);
+        player.health -= dmg;
+        System.out.println(name + " attacks for " + dmg);
+    }
+
+    @Override
+    void heavyAttack(Character player) {
+        int dmg = calculateHeavyDamage(20);
+        player.health -= dmg;
+        System.out.println(name + " uses heavy attack for " + dmg);
+    }
+
+    @Override
+    String getResourceDisplay() {
+        return "";
+    }
+
+    void act(Character player) {
+        if (rand.nextBoolean()) lightAttack(player);
+        else heavyAttack(player);
+    }
+}
+
+// ================= MAIN =================
+public class Main {
+
+    static Scanner input = new Scanner(System.in);
+
+    static Character chooseClass() {
+        System.out.println("1. Archer\n2. Assassin\n3. Mage\n4. Knight");
+        int choice = input.nextInt();
+
+        System.out.print("Name: ");
+        String name = input.next();
+
+        switch (choice) {
+            case 1: return new Archer(name);
+            case 2: return new Assassin(name);
+            case 3: return new Mage(name);
+            case 777: return new Seraphim(name);
+            default: return new Knight(name);
+        }
+    }
+
+    static void battle(Character player, Enemy enemy) {
+        System.out.println("\nA wild " + enemy.name + " appears!");
+
+        while (player.isAlive() && enemy.isAlive()) {
+
+            player.gainStamina();
+            enemy.gainStamina();
+
+            System.out.println("\n" + player.name + " HP: " + player.health + " | " + player.getResourceDisplay());
+            System.out.println(enemy.name + " HP: " + enemy.health);
+
+            System.out.println("1. Light\n2. Heavy");
+            int action = input.nextInt();
+
+            if (action == 1) player.lightAttack(enemy);
+            else player.heavyAttack(enemy);
+
+            if (enemy.isAlive()) enemy.act(player);
+        }
+
+        System.out.println(player.isAlive() ? "Victory!" : "Defeat...");
+    }
+
+    public static void main(String[] args) {
+
+        Character player = chooseClass();
+
+        Enemy[] enemies = {
+            new Enemy("Slime", 30, 4),
+            new Enemy("Hilichurl", 40, 8),
+            new Enemy("Boss", 80, 12)
+        };
+
+        for (Enemy e : enemies) {
+            battle(player, e);
+            if (!player.isAlive()) break;
+        }
+
+        System.out.println("Game Over.");
+    }
+}
